@@ -1,0 +1,74 @@
+##---------------------------------------------##
+##   Spending Category Calculator              ##
+##   Jillian Anderson, August 8 2015           ##
+##---------------------------------------------##
+
+#Type Declarations
+#   Date: a str which represents a specific calendar date
+
+#Variable Definitions
+Fall   = ['/09/01', '/12/31']
+Winter = ['/01/01', '/04/30']
+Spring = ['/05/01', '/08/31']
+
+## get_spending: String, String, String -> (listof String)
+## Pre Conditions: 
+## Post Conditons:
+## example: get_spending('Oct_8_2015.txt', 'Fall', '2015')
+def get_spending (filename, term_to_get, year):
+    trans_list = get_transactions_list (filename, term_to_get, year)
+    return get_categories(trans_list)
+
+
+
+## get_transactions_list (str) -> list(list (Date, int, str))
+## PRE Conditions: 
+##   All transactions contained within file_name must have occured
+##      within the same calendar year.  
+##   file_name must be a string representing a file which is contained within
+##      the same file directory
+
+def get_transactions_list (file_name, term_to_get, year):
+    if term_to_get is 'Fall':
+        term = [year + Fall[0], year + Fall[1]]
+    elif term_to_get is 'Winter':
+        term = [year + Winter[0], year + Winter[1]]
+    else:
+        term = [year + Spring[0], year + Spring[1]]
+        
+    file = open(file_name, 'r')
+    line = file.readline()
+    transactions = []
+    while line:
+        line = line.split(',')
+        line = [line[0], line[3], line[5]]
+        for c in range(0,3):
+            word_len = len(line[c])
+            line[c] = line[c][1:word_len-1]
+            if c is 0:
+                line[c] = line[c].split('/')
+                line[c] = [line[c][2],line[c][0],line[c][1]]
+                if len(line[c][1]) is 1:
+                    line[c][1] = '0' + line[c][1]
+                dash = '/'
+                line[0]= dash.join(line[c])
+        if line[0] >= term[0] and line[0] <= term[1]:
+            transactions.append(line)
+        line = file.readline()        
+    return transactions
+
+
+def get_categories (list):
+    Categories= {}
+    for i in range (len(list)):
+        cat = list[i][2]
+        if cat in Categories:
+            num = list[i][1].replace('.','')
+            Categories[cat] += int(num)
+        else:
+            num = list[i][1].replace('.','')
+            Categories[cat] = int(num)          
+    for key in Categories:
+        val = str(Categories[key])
+        leng = len(val)
+        print key + ': $' + val[0:leng-2] + '.' + val[leng-2:leng]  
